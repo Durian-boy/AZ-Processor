@@ -1,15 +1,15 @@
-/**********通用头文件**********/
+/********** 通用头文件 **********/
 `include "nettype.h"
 `include "stddef.h"
 `include "global_config.h"
 
-/**********其他头文件**********/
+/********** 其他头文件 **********/
 `include "bus.h"
 
-/**********总线主控多路复用器**********/
+/********** 总线主控多路复用器 **********/
 module bus_master_mux (
 
-    /*************总线主控多路复用器的输入信号************/
+    /************* 总线主控多路复用器的输入信号 ************/
 	// 0号总线主控
 	input  wire [`WordAddrBus] m0_addr,	   // 地址
 	input  wire				   m0_as_,	   // 地址选通
@@ -35,14 +35,14 @@ module bus_master_mux (
 	input  wire [`WordDataBus] m3_wr_data, // 写入的数据
 	input  wire				   m3_grnt_,   // 赋予总线
     
-	/**********总线主控多路复用器的输出信号**********/
+	/********** 总线主控多路复用器的输出信号 **********/
 	output reg	[`WordAddrBus] s_addr,	   // 地址
 	output reg				   s_as_,	   // 地址选通
 	output reg				   s_rw,	   // 读/写
 	output reg	[`WordDataBus] s_wr_data   // 写入的数据
 );
 
-	/**********总线主控多路复用器**********/
+	/********** 总线主控多路复用器 **********/
 	always @(*) begin
 		// 选择持有总线使用权的主控
 		if (m0_grnt_ == `ENABLE_) begin			 // 0号总线主控

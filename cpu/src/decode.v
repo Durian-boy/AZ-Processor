@@ -1,39 +1,39 @@
-/**********通用头文件**********/
+/********** 通用头文件 **********/
 `include "nettype.h"
 `include "global_config.h"
 `include "stddef.h"
 
-/**********其他头文件**********/
+/********** 其他头文件 **********/
 `include "isa.h"
 `include "cpu.h"
 
 module decoder (
-	/**********IF/ID流水线寄存器**********/
+	/********** IF/ID流水线寄存器 **********/
 	input  wire [`WordAddrBus]	 if_pc,			 // 程序计数器
 	input  wire [`WordDataBus]	 if_insn,		 // 指令
 	input  wire					 if_en,			 // 流水线数据的有效标志位
-	/**********GPR接口**********/
+	/********** GPR接口 **********/
 	input  wire [`WordDataBus]	 gpr_rd_data_0, // 读取数据0
 	input  wire [`WordDataBus]	 gpr_rd_data_1, // 读取数据1
 	output wire [`RegAddrBus]	 gpr_rd_addr_0, // 读取地址0
 	output wire [`RegAddrBus]	 gpr_rd_addr_1, // 读取地址1
-	/**********来自ID阶段的数据直通**********/
+	/********** 来自ID阶段的数据直通 **********/
 	input  wire					 id_en,			// 流水线数据有效
 	input  wire [`RegAddrBus]	 id_dst_addr,	// 写入地址
 	input  wire					 id_gpr_we_,	// 写入有效
 	input  wire [`MemOpBus]		 id_mem_op,		// 内存操作
-	/**********来自EX阶段的数据直通**********/
+	/********** 来自EX阶段的数据直通 **********/
 	input  wire					 ex_en,			// 流水线数据有效
 	input  wire [`RegAddrBus]	 ex_dst_addr,	// 写入地址
 	input  wire					 ex_gpr_we_,	// 写入有效
 	input  wire [`WordDataBus]	 ex_fwd_data,	// 内存操作
-	/**********来自MEM阶段的数据直通**********/
+	/********** 来自MEM阶段的数据直通 **********/
 	input  wire [`WordDataBus]	 mem_fwd_data,	// 数据直通
-	/**********控制寄存器接口**********/
+	/********** 控制寄存器接口 **********/
 	input  wire [`CpuExeModeBus] exe_mode,		// 执行模式
 	input  wire [`WordDataBus]	 creg_rd_data,	// 读取的数据
 	output wire [`RegAddrBus]	 creg_rd_addr,	// 读取的地址
-	/**********解码结果**********/
+	/********** 解码结果 **********/
 	output reg	[`AluOpBus]		 alu_op,		// ALU操作
 	output reg	[`WordDataBus]	 alu_in_0,		// ALU输入0
 	output reg	[`WordDataBus]	 alu_in_1,		// ALU输入1
@@ -49,37 +49,37 @@ module decoder (
 	output reg					 ld_hazard		// Load冒险
 );
 
-	/**********指令字段**********/
+	/********** 指令字段 **********/
 	wire [`IsaOpBus]	op		= if_insn[`IsaOpLoc];	  // 操作码
 	wire [`RegAddrBus]	ra_addr = if_insn[`IsaRaAddrLoc]; // Ra地址
 	wire [`RegAddrBus]	rb_addr = if_insn[`IsaRbAddrLoc]; // Rb地址
 	wire [`RegAddrBus]	rc_addr = if_insn[`IsaRcAddrLoc]; // Rc地址
 	wire [`IsaImmBus]	imm		= if_insn[`IsaImmLoc];	  // 立即数
 
-	/**********立即数**********/
+	/********** 立即数 **********/
 	// 符号扩充后的立即数
 	wire [`WordDataBus] imm_s = {{`ISA_EXT_W{imm[`ISA_IMM_MSB]}}, imm};
 	// 0扩充后的立即数
 	wire [`WordDataBus] imm_u = {{`ISA_EXT_W{1'b0}}, imm};
 
-	/**********寄存器读取地址**********/
+	/********** 寄存器读取地址 **********/
 	assign gpr_rd_addr_0 = ra_addr; // 通用寄存器读取地址0
 	assign gpr_rd_addr_1 = rb_addr; // 通用寄存器读取地址1
 	assign creg_rd_addr	 = ra_addr; // 控制寄存器读取地址
 
-	/**********通用寄存器读取的数据**********/
+	/********** 通用寄存器读取的数据 **********/
 	reg			[`WordDataBus]	ra_data;						  // Ra寄存器读取的数据（无符号）
 	wire signed [`WordDataBus]	s_ra_data = $signed(ra_data);	  // Ra寄存器读取的数据（有符号）
 	reg			[`WordDataBus]	rb_data;						  // Rb寄存器读取的数据（无符号）
 	wire signed [`WordDataBus]	s_rb_data = $signed(rb_data);	  // Rb寄存器读取的数据（有符号）
 	assign mem_wr_data = rb_data; // 内存写入数据
 
-	/**********生成地址**********/
+	/********** 生成地址 **********/
 	wire [`WordAddrBus] ret_addr  = if_pc + 1'b1;					 // 返回地址
 	wire [`WordAddrBus] br_target = if_pc + imm_s[`WORD_ADDR_MSB:0]; // 分支目标地址
 	wire [`WordAddrBus] jr_target = ra_data[`WordAddrLoc];		     // 跳转目标地址
 
-	/**********数据直通**********/
+	/********** 数据直通 **********/
 	always @(*) begin
 		// Ra寄存器
 		if ((id_en == `ENABLE) && (id_gpr_we_ == `ENABLE_) && 
@@ -103,7 +103,7 @@ module decoder (
 		end
 	end
 
-	/**********Load冒险检测**********/
+	/********** Load冒险检测 **********/
 	always @(*) begin
 		if ((id_en == `ENABLE) && (id_mem_op == `MEM_OP_LDW) &&
 			((id_dst_addr == ra_addr) || (id_dst_addr == rb_addr))) begin
@@ -113,7 +113,7 @@ module decoder (
 		end
 	end
 
-	/**********指令解码**********/
+	/********** 指令解码 **********/
 	always @(*) begin
 		// 默认值
 		alu_op	 = `ALU_OP_NOP;

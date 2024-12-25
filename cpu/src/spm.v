@@ -1,21 +1,21 @@
-/**********通用头文件**********/
+/********** 通用头文件 **********/
 `include "nettype.h"
 `include "global_config.h"
 `include "stddef.h"
 
-/**********其他头文件**********/
+/********** 其他头文件 **********/
 `include "spm.h"
 
 module spm (
-	/**********时钟**********/
+	/********** 时钟 **********/
 	input  wire				   clk,				// 时钟
-	/**********A端口：IF阶段**********/
+	/********** A端口：IF阶段 **********/
 	input  wire [`SpmAddrBus]  if_spm_addr,		// 地址
 	input  wire				   if_spm_as_,		// 地址选通
 	input  wire				   if_spm_rw,		// 读/写
 	input  wire [`WordDataBus] if_spm_wr_data,	// 写入的数据
 	output wire [`WordDataBus] if_spm_rd_data,	// 读取的数据
-	/**********B端口：MEM阶段**********/
+	/********** B端口：MEM阶段 **********/
 	input  wire [`SpmAddrBus]  mem_spm_addr,	// 地址
 	input  wire				   mem_spm_as_,		// 地址选通
 	input  wire				   mem_spm_rw,		// 读/写
@@ -23,11 +23,11 @@ module spm (
 	output wire [`WordDataBus] mem_spm_rd_data	// 读取的数据
 );
 
-	/**********内部信号**********/
+	/********** 内部信号 **********/
 	reg						   wea;			// 写入有效
 	reg						   web;			// 写入有效
 
-	/**********写入有效信号的生成**********/
+	/********** 写入有效信号的生成 **********/
 	always @(*) begin
 		// A端口
 		if ((if_spm_as_ == `ENABLE_) && (if_spm_rw == `WRITE)) begin   
@@ -45,13 +45,13 @@ module spm (
 
 	/********** Xilinx FPGA Block RAM : 双端口RAM **********/
 	x_s3e_dpram x_s3e_dpram (
-		/**********A端口：IF阶段**********/
+		/********** A端口：IF阶段 **********/
 		.clka  (clk),			  // 时钟
 		.addra (if_spm_addr),	  // 地址
 		.dina  (if_spm_wr_data),  // 写入的数据（未连接），因为IF阶段只从SPM中读，不会去写
 		.wea   (wea),			  // 写入有效（无效），因为IF阶段只从SPM中读，不会去写
 		.douta (if_spm_rd_data),  // 读取的数据
-		/**********B端口：MEM阶段**********/
+		/********** B端口：MEM阶段 **********/
 		.clkb  (clk),			  // 时钟
 		.addrb (mem_spm_addr),	  // 地址
 		.dinb  (mem_spm_wr_data), // 写入的数据

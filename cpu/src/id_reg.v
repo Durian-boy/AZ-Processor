@@ -1,17 +1,17 @@
-/**********通用头文件**********/
+/********** 通用头文件 **********/
 `include "nettype.h"
 `include "global_config.h"
 `include "stddef.h"
 
-/**********其他头文件**********/
+/********** 其他头文件 **********/
 `include "isa.h"
 `include "cpu.h"
 
 module id_reg (
-	/**********时钟与复位**********/
+	/********** 时钟与复位 **********/
 	input  wire				   clk,			   // 时钟
 	input  wire				   reset,		   // 异步复位
-	/**********解码结果**********/
+	/********** 解码结果 **********/
 	input  wire [`AluOpBus]	   alu_op,		   // ALU操作
 	input  wire [`WordDataBus] alu_in_0,	   // ALU输入0
 	input  wire [`WordDataBus] alu_in_1,	   // ALU输入1
@@ -22,13 +22,13 @@ module id_reg (
 	input  wire [`RegAddrBus]  dst_addr,	   // 通用寄存器写入地址
 	input  wire				   gpr_we_,		   // 通用寄存器写入有效
 	input  wire [`IsaExpBus]   exp_code,	   // 异常代码
-	/**********流水线控制信号**********/
+	/********** 流水线控制信号 **********/
 	input  wire				   stall,		   // 延迟信号
 	input  wire				   flush,		   // 刷新信号
-	/**********IF/ID流水线寄存器**********/
+	/********** IF/ID流水线寄存器 **********/
 	input  wire [`WordAddrBus] if_pc,		   // 程序计数器
 	input  wire				   if_en,		   // 流水线数据是否有效
-	/**********ID/EX流水线寄存器**********/
+	/********** ID/EX流水线寄存器 **********/
 	output reg	[`WordAddrBus] id_pc,		   // 程序计数器
 	output reg				   id_en,		   // 流水线数据是否有效
 	output reg	[`AluOpBus]	   id_alu_op,	   // ALU操作
@@ -43,7 +43,7 @@ module id_reg (
 	output reg [`IsaExpBus]	   id_exp_code	   // 异常代码
 );
 
-	/**********流水线寄存器**********/
+	/********** 流水线寄存器 **********/
 	always @(posedge clk or `RESET_EDGE reset) begin
 		if (reset == `RESET_ENABLE) begin 
 			// 异步复位

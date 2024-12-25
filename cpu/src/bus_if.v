@@ -1,33 +1,33 @@
-/**********通用头文件**********/
+/********** 通用头文件 **********/
 `include "nettype.h"
 `include "global_config.h"
 `include "stddef.h"
 
-/**********其他头文件**********/
+/********** 其他头文件 **********/
 `include "cpu.h"
 `include "bus.h"
 
 module bus_if (
-	/**********时钟和复位**********/
+	/********** 时钟和复位 **********/
 	input  wire				   clk,			   // 时钟
 	input  wire				   reset,		   // 异步复位
-	/**********流水线控制信号**********/
+	/********** 流水线控制信号 **********/
 	input  wire				   stall,		   // 延迟信号
 	input  wire				   flush,		   // 刷新信号
 	output reg				   busy,		   // 总线忙信号
-	/**********CPU接口**********/
+	/********** CPU接口 **********/
 	input  wire [`WordAddrBus] addr,		   // CPU：地址
 	input  wire				   as_,			   // CPU：地址有效
 	input  wire				   rw,			   // CPU：读/写
 	input  wire [`WordDataBus] wr_data,		   // CPU：写入的数据
 	output reg	[`WordDataBus] rd_data,		   // CPU：读取的数据
-	/**********SPM接口**********/
+	/********** SPM接口 **********/
 	input  wire [`WordDataBus] spm_rd_data,	   // SPM：读取的数据
 	output wire [`WordAddrBus] spm_addr,	   // SPM：地址
 	output reg				   spm_as_,		   // SPM：地址选通
 	output wire				   spm_rw,		   // SPM：读/写
 	output wire [`WordDataBus] spm_wr_data,	   // SPM：写入的数据
-	/**********总线接口**********/
+	/********** 总线接口 **********/
 	input  wire [`WordDataBus] bus_rd_data,	   // 总线：读取的数据
 	input  wire				   bus_rdy_,	   // 总线：就绪
 	input  wire				   bus_grnt_,	   // 总线：许可
@@ -38,20 +38,20 @@ module bus_if (
 	output reg	[`WordDataBus] bus_wr_data	   // 总线：写入的数据
 );
 
-	/**********内部信号**********/
+	/********** 内部信号 **********/
 	reg	 [`BusIfStateBus]	   state;		   // 总线接口状态
 	reg	 [`WordDataBus]		   rd_buf;		   // 读取缓存
 	wire [`BusSlaveIndexBus]   s_index;		   // 总线从属索引
 
-	/**********1.内存访问控制（组合电路）**********/
+	/********** 1.内存访问控制（组合电路）**********/
 	assign s_index	   = addr[`BusSlaveIndexLoc];   // 使用PC寄存器的高三位生成总线从属索引
 
-	/**********输出的赋值**********/
+	/********** 输出的赋值 **********/
 	assign spm_addr	   = addr;
 	assign spm_rw	   = rw;
 	assign spm_wr_data = wr_data;
 						 
-	/**********内存访问的控制**********/
+	/********** 内存访问的控制 **********/
 	always @(*) begin
 		// 默认值
 		rd_data	 = `WORD_DATA_W'h0;
@@ -96,7 +96,7 @@ module bus_if (
 		endcase
 	end
 
-   /**********2.总线接口控制（时序电路）**********/ 
+   /********** 2.总线接口控制（时序电路）**********/ 
    always @(posedge clk or `RESET_EDGE reset) begin
 		if (reset == `RESET_ENABLE) begin
 			// 异步复位
