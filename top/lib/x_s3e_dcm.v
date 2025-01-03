@@ -12,7 +12,7 @@ module x_s3e_dcm (
 
     /********** 时钟输出 **********/
     assign CLK0_OUT	  = CLKIN_IN;
-    assign CLK180_OUT = ~CLKIN_IN;
+    assign CLK180_OUT = ~CLKIN_IN;  // 180度相位差
     assign LOCKED_OUT = ~RST_IN;
    
 endmodule
